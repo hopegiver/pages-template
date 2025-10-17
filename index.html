@@ -1,0 +1,193 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Pages Template - Widget Demo</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            padding: 40px 20px;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            color: white;
+            margin-bottom: 60px;
+        }
+
+        .header h1 {
+            font-size: 48px;
+            font-weight: 700;
+            margin-bottom: 16px;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.2);
+        }
+
+        .header p {
+            font-size: 20px;
+            opacity: 0.95;
+        }
+
+        .content {
+            margin-bottom: 40px;
+        }
+
+        .usage-guide {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+            margin-bottom: 30px;
+        }
+
+        .usage-guide h2 {
+            font-size: 20px;
+            margin-bottom: 16px;
+            color: #333;
+        }
+
+        .usage-codes {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+
+        .code-block {
+            background: #f8f9fa;
+            border: 1px solid #e9ecef;
+            border-radius: 6px;
+            padding: 16px;
+        }
+
+        .code-block h3 {
+            font-size: 14px;
+            margin-bottom: 10px;
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .code-block pre {
+            margin: 0;
+            overflow-x: auto;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .code-block code {
+            font-family: 'Monaco', 'Consolas', monospace;
+            color: #e83e8c;
+        }
+
+        .widget-demo {
+            background: white;
+            border-radius: 12px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.2);
+        }
+
+        .widget-demo h2 {
+            font-size: 28px;
+            margin-bottom: 24px;
+            color: #333;
+            text-align: center;
+        }
+
+        #widget-root {
+            min-height: 500px;
+        }
+
+        .footer {
+            text-align: center;
+            color: white;
+            margin-top: 40px;
+            opacity: 0.9;
+        }
+
+        .footer a {
+            color: white;
+            text-decoration: underline;
+        }
+
+        @media (max-width: 968px) {
+            .header h1 {
+                font-size: 36px;
+            }
+
+            .usage-codes {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1>📦 Pages Template</h1>
+            <p>임베딩 가능한 위젯 서비스 - Cloudflare Pages</p>
+        </div>
+
+        <div class="content">
+            <!-- 사용법 가이드 -->
+            <div class="usage-guide">
+                <h2>🚀 사용법</h2>
+                <div class="usage-codes">
+                    <div class="code-block">
+                        <h3>개발 모드 (ES6)</h3>
+                        <pre><code>&lt;script type="module"&gt;
+  import { Widget } from './src/index.js';
+
+  new Widget('#widget-root', {
+    apiKey: 'demo-key'
+  });
+&lt;/script&gt;</code></pre>
+                    </div>
+
+                    <div class="code-block">
+                        <h3>배포 모드 (고객용)</h3>
+                        <pre><code>&lt;div id="my-widget"&gt;&lt;/div&gt;
+&lt;script src="https://cdn.yourservice.com/widget.min.js"&gt;&lt;/script&gt;
+&lt;script&gt;
+  new PagesTemplate.Widget('#my-widget', {
+    apiKey: 'your-api-key'
+  });
+&lt;/script&gt;</code></pre>
+                    </div>
+                </div>
+            </div>
+
+            <!-- 위젯 데모 -->
+            <div class="widget-demo">
+                <h2>🎨 위젯 데모</h2>
+                <div id="widget-root"></div>
+            </div>
+        </div>
+
+        <div class="footer">
+            <p>Built with ❤️ for Cloudflare Pages</p>
+        </div>
+    </div>
+
+    <!-- ES6 모듈 방식으로 소스 파일 직접 로딩 -->
+    <script type="module">
+        import { Widget } from './src/index.js';
+
+        const widget = new Widget('#widget-root', {
+            apiKey: 'demo-key',
+            theme: 'light'
+        });
+    </script>
+</body>
+</html>

@@ -1,0 +1,27 @@
+{
+  "items": [
+    {
+      "id": 1,
+      "name": "Wireless Headphones",
+      "price": 79.99,
+      "quantity": 1,
+      "image": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=150&h=150&fit=crop"
+    },
+    {
+      "id": 3,
+      "name": "Running Shoes",
+      "price": 89.99,
+      "quantity": 2,
+      "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=150&h=150&fit=crop"
+    },
+    {
+      "id": 6,
+      "name": "Desk Lamp",
+      "price": 29.99,
+      "quantity": 1,
+      "image": "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=150&h=150&fit=crop"
+    }
+  ],
+  "total": 289.96,
+  "itemCount": 4
+}

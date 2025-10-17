@@ -1,0 +1,16 @@
+{
+  "name": "pages-template",
+  "version": "1.0.0",
+  "description": "Cloudflare Pages template project",
+  "type": "module",
+  "scripts": {
+    "build": "node build.js",
+    "dev": "node build.js --watch"
+  },
+  "keywords": ["cloudflare", "pages", "template"],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "esbuild": "^0.20.0"
+  }
+}

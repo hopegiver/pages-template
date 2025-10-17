@@ -1,0 +1,28 @@
+{
+  "id": 1001,
+  "name": "John Doe",
+  "email": "john.doe@example.com",
+  "avatar": "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=200&h=200&fit=crop",
+  "phone": "+1 (555) 123-4567",
+  "address": "123 Main Street, Apt 4B, New York, NY 10001",
+  "memberSince": "2022-03-15T00:00:00.000Z",
+  "preferences": {
+    "newsletter": true,
+    "notifications": true,
+    "theme": "light"
+  },
+  "orderHistory": [
+    {
+      "orderId": "ORD-2024-001",
+      "date": "2024-01-15",
+      "total": 249.99,
+      "status": "Delivered"
+    },
+    {
+      "orderId": "ORD-2024-002",
+      "date": "2024-02-20",
+      "total": 89.99,
+      "status": "Delivered"
+    }
+  ]
+}

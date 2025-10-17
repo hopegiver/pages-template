@@ -1,0 +1,44 @@
+[
+  {
+    "id": 1,
+    "name": "무선 블루투스 헤드폰",
+    "price": 89000,
+    "image": "https://images.unsplash.com/photo-1505740420928-5e560c06d30e?w=400&h=300&fit=crop",
+    "category": "전자제품"
+  },
+  {
+    "id": 2,
+    "name": "스마트 워치",
+    "price": 249000,
+    "image": "https://images.unsplash.com/photo-1523275335684-37898b6baf30?w=400&h=300&fit=crop",
+    "category": "전자제품"
+  },
+  {
+    "id": 3,
+    "name": "런닝화",
+    "price": 129000,
+    "image": "https://images.unsplash.com/photo-1542291026-7eec264c27ff?w=400&h=300&fit=crop",
+    "category": "패션"
+  },
+  {
+    "id": 4,
+    "name": "커피 메이커",
+    "price": 69000,
+    "image": "https://images.unsplash.com/photo-1517668808822-9ebb02f2a0e6?w=400&h=300&fit=crop",
+    "category": "가전"
+  },
+  {
+    "id": 5,
+    "name": "백팩",
+    "price": 49000,
+    "image": "https://images.unsplash.com/photo-1553062407-98eeb64c6a62?w=400&h=300&fit=crop",
+    "category": "패션"
+  },
+  {
+    "id": 6,
+    "name": "LED 데스크 램프",
+    "price": 39000,
+    "image": "https://images.unsplash.com/photo-1507473885765-e6ed057f782c?w=400&h=300&fit=crop",
+    "category": "가전"
+  }
+]
