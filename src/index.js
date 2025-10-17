@@ -7,8 +7,6 @@ import { State, getState } from './core/state.js';
 import { IndexPage } from './pages/index.js';
 import { ProductPage } from './pages/product.js';
 import { CartPage } from './pages/cart.js';
-import { CheckoutPage } from './pages/checkout.js';
-import { ProfilePage } from './pages/profile.js';
 import { Modal } from './components/Modal.js';
 
 // Inject styles
@@ -40,8 +38,6 @@ if (typeof window !== 'undefined') {
       IndexPage,
       ProductPage,
       CartPage,
-      CheckoutPage,
-      ProfilePage,
       Modal
     }
   };
@@ -58,7 +54,5 @@ export {
   IndexPage,
   ProductPage,
   CartPage,
-  CheckoutPage,
-  ProfilePage,
   Modal
 };

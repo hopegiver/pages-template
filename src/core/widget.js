@@ -3,6 +3,7 @@
 import { createElement } from '../utils/dom.js';
 import { IndexPage } from '../pages/index.js';
 import { ProductPage } from '../pages/product.js';
+import { CartPage } from '../pages/cart.js';
 import { Router } from './router.js';
 import { getState } from './state.js';
 
@@ -31,8 +32,6 @@ export class Widget {
       '/': () => this.showProductList(),
       '/product': (query) => this.showProductDetail(query),
       '/cart': () => this.showCart(),
-      '/checkout': () => this.showCheckout(),
-      '/profile': () => this.showProfile(),
       '*': () => this.showProductList() // 404 처리
     });
   }
@@ -139,36 +138,24 @@ export class Widget {
   }
 
   /**
-   * 장바구니 보기 (예시)
+   * 장바구니 보기
    */
   showCart() {
     const containerElement = this.getContainer();
     if (!containerElement) return;
 
     this.state.setCurrentView('cart');
-    containerElement.innerHTML = '<div class="widget-content">장바구니 (준비 중)</div>';
-  }
+    containerElement.innerHTML = '';
 
-  /**
-   * 결제 보기 (예시)
-   */
-  showCheckout() {
-    const containerElement = this.getContainer();
-    if (!containerElement) return;
+    const cartPage = new CartPage({
+      state: this.state,
+      onBack: () => {
+        this.router.back();
+      }
+    });
 
-    this.state.setCurrentView('checkout');
-    containerElement.innerHTML = '<div class="widget-content">결제 (준비 중)</div>';
-  }
-
-  /**
-   * 프로필 보기 (예시)
-   */
-  showProfile() {
-    const containerElement = this.getContainer();
-    if (!containerElement) return;
-
-    this.state.setCurrentView('profile');
-    containerElement.innerHTML = '<div class="widget-content">프로필 (준비 중)</div>';
+    const cartElement = cartPage.render();
+    containerElement.appendChild(cartElement);
   }
 
   /**
