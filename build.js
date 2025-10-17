@@ -12,6 +12,7 @@ const esmConfig = {
   bundle: true,
   format: 'esm',
   outfile: `dist/${projectName}.esm.js`,
+  minify: true,
   sourcemap: true,
   target: ['es2020'],
 };
