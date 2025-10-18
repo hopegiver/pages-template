@@ -25,12 +25,12 @@ export class Widget {
   }
 
   /**
-   * 라우트 설정 (하이브리드 방식: 경로 + 쿼리)
+   * 라우트 설정 (Path Parameters 방식)
    */
   setupRoutes() {
     this.router.addRoutes({
       '/': () => this.showProductList(),
-      '/product': (query) => this.showProductDetail(query),
+      '/product/:id': (params) => this.showProductDetail(params),
       '/cart': () => this.showCart(),
       '*': () => this.showProductList() // 404 처리
     });
@@ -89,8 +89,8 @@ export class Widget {
     const productList = new IndexPage({
       state: this.state,
       onProductClick: (product) => {
-        // Router를 통한 네비게이션 (쿼리 파라미터 사용)
-        this.router.navigate('/product', { id: product.id });
+        // Router를 통한 네비게이션 (Path Parameters 사용)
+        this.router.navigate(`/product/${product.id}`);
       }
     });
 
@@ -100,13 +100,13 @@ export class Widget {
 
   /**
    * 상품 상세 보기
-   * @param {object} query - 쿼리 파라미터 { id: "1" }
+   * @param {object} params - Path 파라미터 { id: "1" }
    */
-  showProductDetail(query) {
+  showProductDetail(params) {
     const containerElement = this.getContainer();
     if (!containerElement) return;
 
-    const productId = parseInt(query.id);
+    const productId = parseInt(params.id);
     if (!productId) {
       console.error('Product ID is required');
       this.router.navigate('/');
@@ -167,11 +167,11 @@ export class Widget {
 
   /**
    * 네비게이션 헬퍼
-   * @param {string} path - 경로
-   * @param {object} query - 쿼리 파라미터
+   * @param {string} path - 경로 (예: "/product/1")
+   * @param {object} state - 히스토리 상태
    */
-  navigate(path, query = {}) {
-    this.router.navigate(path, query);
+  navigate(path, state = {}) {
+    this.router.navigate(path, state);
   }
 
   /**

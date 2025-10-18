@@ -1,28 +1,20 @@
-// 라우팅 관리 (하이브리드 방식: 경로 + 쿼리 파라미터)
-
-/**
- * 쿼리 스트링 생성
- */
-export function buildQueryString(params) {
-  if (!params || Object.keys(params).length === 0) {
-    return '';
-  }
-
-  return Object.keys(params)
-    .filter(key => params[key] !== undefined && params[key] !== null)
-    .map(key => `${encodeURIComponent(key)}=${encodeURIComponent(params[key])}`)
-    .join('&');
-}
+// 라우팅 관리 (Path Parameters 방식)
 
 /**
  * 경로 생성 헬퍼
- * @param {string} path - 경로
- * @param {object} query - 쿼리 파라미터
- * @returns {string} - 완성된 경로 (예: "/product?id=1")
+ * @param {string} path - 경로 (예: "/product/:id")
+ * @param {object} params - 경로 파라미터 (예: { id: 1 })
+ * @returns {string} - 완성된 경로 (예: "/product/1")
  */
-export function createPath(path, query = {}) {
-  const queryString = buildQueryString(query);
-  return queryString ? `${path}?${queryString}` : path;
+export function createPath(path, params = {}) {
+  let finalPath = path;
+
+  // :param 형태의 파라미터를 실제 값으로 치환
+  Object.keys(params).forEach(key => {
+    finalPath = finalPath.replace(`:${key}`, params[key]);
+  });
+
+  return finalPath;
 }
 
 export class Router {
@@ -30,7 +22,7 @@ export class Router {
     this.routes = routes;
     this.currentRoute = null;
     this.currentPath = null;
-    this.queryParams = {};
+    this.pathParams = {};
 
     // popstate 이벤트 리스너 바인딩
     this.handlePopState = this.handlePopState.bind(this);
@@ -59,61 +51,71 @@ export class Router {
   }
 
   /**
-   * 경로와 쿼리 분리
-   * 예: "/product?id=1&sort=price" → { path: "/product", query: "id=1&sort=price" }
+   * Path Parameters 파싱
+   * 예: 패턴 "/product/:id", 경로 "/product/123" → { id: "123" }
    */
-  parseHash(hash) {
-    const [path, queryString] = hash.split('?');
-    return {
-      path: path || '/',
-      queryString: queryString || ''
-    };
-  }
+  extractParams(pattern, path) {
+    const patternParts = pattern.split('/');
+    const pathParts = path.split('/');
 
-  /**
-   * 쿼리 스트링 파싱
-   */
-  parseQueryString(queryString) {
-    if (!queryString) {
-      return {};
+    if (patternParts.length !== pathParts.length) {
+      return null;
     }
 
-    return queryString.split('&').reduce((params, param) => {
-      const [key, value] = param.split('=');
-      params[decodeURIComponent(key)] = decodeURIComponent(value || '');
-      return params;
-    }, {});
+    const params = {};
+    for (let i = 0; i < patternParts.length; i++) {
+      if (patternParts[i].startsWith(':')) {
+        const paramName = patternParts[i].slice(1);
+        params[paramName] = decodeURIComponent(pathParts[i]);
+      } else if (patternParts[i] !== pathParts[i]) {
+        return null;
+      }
+    }
+
+    return params;
   }
 
   /**
-   * 라우트 매칭
+   * 라우트 매칭 (Path Parameters 지원)
    */
   matchRoute(path) {
     // 정확히 일치하는 라우트 찾기
     if (this.routes[path]) {
-      return this.routes[path];
+      return { handler: this.routes[path], params: {} };
+    }
+
+    // Path Parameters 패턴 매칭
+    for (const pattern in this.routes) {
+      if (pattern === '*') continue;
+
+      const params = this.extractParams(pattern, path);
+      if (params !== null) {
+        return { handler: this.routes[pattern], params };
+      }
     }
 
     // 404 처리
-    return this.routes['*'] || null;
+    if (this.routes['*']) {
+      return { handler: this.routes['*'], params: {} };
+    }
+
+    return null;
   }
 
   /**
    * 라우트 처리
    */
   handleRoute() {
-    const hash = this.getHash();
-    const { path, queryString } = this.parseHash(hash);
-    const queryParams = this.parseQueryString(queryString);
+    const path = this.getHash();
 
-    this.currentRoute = hash;
+    this.currentRoute = path;
     this.currentPath = path;
-    this.queryParams = queryParams;
 
-    const handler = this.matchRoute(path);
+    const match = this.matchRoute(path);
 
-    if (handler) {
-      handler(queryParams);
+    if (match) {
+      this.pathParams = match.params;
+      match.handler(match.params);
     } else {
       console.warn('No route handler found for:', path);
     }
@@ -122,32 +124,25 @@ export class Router {
   /**
    * popstate 이벤트 핸들러 (뒤로가기/앞으로가기)
    */
-  handlePopState(event) {
+  handlePopState() {
     this.handleRoute();
   }
 
   /**
    * 네비게이션 (히스토리에 추가)
-   * @param {string} path - 경로 (예: "/product")
-   * @param {object} query - 쿼리 파라미터 (예: { id: 1, sort: 'price' })
+   * @param {string} path - 경로 (예: "/product/1")
    * @param {object} state - 히스토리 상태
    */
-  navigate(path, query = {}, state = {}) {
-    const queryString = buildQueryString(query);
-    const fullPath = queryString ? `${path}?${queryString}` : path;
-
-    window.history.pushState(state, '', `#${fullPath}`);
+  navigate(path, state = {}) {
+    window.history.pushState(state, '', `#${path}`);
     this.handleRoute();
   }
 
   /**
    * 리다이렉트 (히스토리 대체)
    */
-  redirect(path, query = {}, state = {}) {
-    const queryString = buildQueryString(query);
-    const fullPath = queryString ? `${path}?${queryString}` : path;
-
-    window.history.replaceState(state, '', `#${fullPath}`);
+  redirect(path, state = {}) {
+    window.history.replaceState(state, '', `#${path}`);
     this.handleRoute();
   }
 
@@ -172,19 +167,19 @@ export class Router {
     return {
       fullPath: this.currentRoute,
       path: this.currentPath,
-      query: this.queryParams,
+      params: this.pathParams,
       hash: this.getHash()
     };
   }
 
   /**
-   * 쿼리 파라미터 가져오기
+   * Path 파라미터 가져오기
    */
-  getQuery(key) {
+  getParam(key) {
     if (key) {
-      return this.queryParams[key];
+      return this.pathParams[key];
     }
-    return { ...this.queryParams };
+    return { ...this.pathParams };
   }
 
   /**
@@ -192,13 +187,6 @@ export class Router {
    */
   isRoute(path) {
     return this.currentPath === path;
-  }
-
-  /**
-   * 쿼리 스트링 생성 (헬퍼 함수 재활용)
-   */
-  buildQueryString(params) {
-    return buildQueryString(params);
   }
 
   /**

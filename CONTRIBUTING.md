@@ -8,6 +8,7 @@
 **언어**: Vanilla JavaScript (ES6 Modules)
 **번들러**: esbuild
 **스타일**: CSS-in-JS
+**라우팅**: Path Parameters (예: #/product/1)
 **API**: Static JSON (Mock API)
 
 ## 📁 프로젝트 구조
@@ -17,7 +18,7 @@ pages-template/
 ├── src/
 │   ├── core/                 # 핵심 로직 (건드리지 말 것)
 │   │   ├── state.js         # 전역 상태 관리
-│   │   ├── router.js        # 하이브리드 라우팅 (hash + query)
+│   │   ├── router.js        # Path Parameters 라우팅
 │   │   ├── widget.js        # 메인 위젯 컨트롤러
 │   │   └── api.js           # API 호출 래퍼
 │   ├── pages/               # 라우트별 페이지 (파일명 = 라우트명)
@@ -83,18 +84,18 @@ pages-template/
 
 ### 2. 라우팅 규칙
 
-#### 하이브리드 라우팅 (Hash + Query Parameters)
+#### Path Parameters 방식
 ```javascript
 // ✅ 올바른 예시
-router.navigate('/product', { id: 1, color: 'red' });
-// 결과: #/product?id=1&color=red
+router.navigate('/product/1');
+// 결과: #/product/1
 
-router.navigate('/search', { q: 'phone', sort: 'price', page: 2 });
-// 결과: #/search?q=phone&sort=price&page=2
+router.navigate('/product/123');
+// 결과: #/product/123
 
-// ❌ 잘못된 예시 (Path Parameters 사용 금지)
-router.navigate('/product/:id');  // NO!
-router.navigate('/product/1');    // NO!
+// ❌ 잘못된 예시 (Query Parameters 사용 금지)
+router.navigate('/product', { id: 1 });  // NO!
+router.navigate('/product?id=1');        // NO!
 ```
 
 #### 새로운 라우트 추가 방법
@@ -104,10 +105,10 @@ router.navigate('/product/1');    // NO!
 4. `src/index.js`에 import/export 추가
 
 ```javascript
-// 1. src/pages/search.js 생성
-export class SearchPage {
+// 1. src/pages/category.js 생성
+export class CategoryPage {
   constructor(props = {}) {
-    this.query = props.query || '';
+    this.categoryId = props.categoryId;
   }
   render() { ... }
 }
@@ -116,24 +117,24 @@ export class SearchPage {
 setupRoutes() {
   this.router.addRoutes({
     '/': () => this.showProductList(),
-    '/product': (query) => this.showProductDetail(query),
-    '/search': (query) => this.showSearch(query),  // 추가
+    '/product/:id': (params) => this.showProductDetail(params),
+    '/category/:id': (params) => this.showCategory(params),  // 추가
     '*': () => this.showProductList()
   });
 }
 
 // 3. widget.js - 메서드 구현
-showSearch(query = {}) {
-  const searchQuery = query.q || '';
-  const searchPage = new SearchPage({ query: searchQuery });
-  const element = searchPage.render();
+showCategory(params) {
+  const categoryId = parseInt(params.id);
+  const categoryPage = new CategoryPage({ categoryId });
+  const element = categoryPage.render();
   this.getContainer().innerHTML = '';
   this.getContainer().appendChild(element);
 }
 
 // 4. src/index.js - import/export 추가
-import { SearchPage } from './pages/search.js';
-export { ..., SearchPage };
+import { CategoryPage } from './pages/category.js';
+export { ..., CategoryPage };
 ```
 
 ### 3. State 관리 규칙
@@ -344,14 +345,14 @@ async loadData() {
 
 ## ⚠️ 금지사항 (DO NOT)
 
-1. **Path Parameters 사용 금지**
+1. **Query Parameters 사용 금지**
    ```javascript
    // ❌ 금지
-   router.navigate('/product/:id');
-   router.navigate('/product/123');
+   router.navigate('/product', { id: 123 });
+   router.navigate('/product?id=123');
 
    // ✅ 사용
-   router.navigate('/product', { id: 123 });
+   router.navigate('/product/123');
    ```
 
 2. **Core 파일 함부로 수정 금지**
@@ -389,7 +390,7 @@ async loadData() {
 ### 주요 파일 설명
 - **src/index.js**: 전역 API 노출, 스타일 주입
 - **src/core/widget.js**: 라우트 설정, 페이지 전환 로직
-- **src/core/router.js**: 하이브리드 라우팅 (hash + query)
+- **src/core/router.js**: Path Parameters 라우팅
 - **src/core/state.js**: 전역 상태 관리, 이벤트 시스템
 - **build.js**: esbuild 설정 (ESM + Minified 출력)
 
@@ -623,4 +624,4 @@ renderProductInfo() {
 
 **이 문서를 반드시 따라주세요. 일관된 코드 구조는 프로젝트의 생명입니다.**
 
-마지막 업데이트: 2025-10-17
+마지막 업데이트: 2025-10-18
