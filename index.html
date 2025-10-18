@@ -149,7 +149,7 @@
                         <pre><code>&lt;script type="module"&gt;
   import { Widget } from './src/index.js';
 
-  new Widget('#widget-root', {
+  const widget = new Widget('#widget-root', {
     apiKey: 'demo-key'
   });
 &lt;/script&gt;</code></pre>
@@ -160,7 +160,7 @@
                         <pre><code>&lt;div id="my-widget"&gt;&lt;/div&gt;
 &lt;script src="https://cdn.yourservice.com/widget.min.js"&gt;&lt;/script&gt;
 &lt;script&gt;
-  new PagesTemplate.Widget('#my-widget', {
+  const widget = new Widget('#my-widget', {
     apiKey: 'your-api-key'
   });
 &lt;/script&gt;</code></pre>
@@ -186,8 +186,11 @@
 
         const widget = new Widget('#widget-root', {
             apiKey: 'demo-key',
-            theme: 'light'
+            theme: 'light',
+            persistState: true
         });
+
+        console.log('Widget instance:', widget);
     </script>
 </body>
 </html>

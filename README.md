@@ -62,11 +62,48 @@ src/
 └── styles/      # CSS-in-JS
 ```
 
+## 💡 사용법
+
+### 개발 모드 (ES6 Modules)
+
+```html
+<script type="module">
+  import { Widget } from './src/index.js';
+
+  const widget = new Widget('#widget-root', {
+    apiKey: 'demo-key'
+  });
+</script>
+```
+
+### 배포 모드 (고객용)
+
+```html
+<div id="my-widget"></div>
+<script src="https://cdn.yourservice.com/widget.min.js"></script>
+<script>
+  const widget = new Widget('#my-widget', {
+    apiKey: 'your-api-key'
+  });
+</script>
+```
+
+또는 네임스페이스 사용:
+
+```html
+<script>
+  const widget = new PagesTemplate.Widget('#my-widget', {
+    apiKey: 'your-api-key'
+  });
+</script>
+```
+
 ## 🛠️ 기술 스택
 
 - Vanilla JavaScript (ES6 Modules)
 - esbuild
 - CSS-in-JS
+- Path Parameters 라우팅 (#/product/1)
 - Mock API (Static JSON)
 - Cloudflare Pages
 

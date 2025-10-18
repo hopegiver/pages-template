@@ -42,6 +42,9 @@ if (typeof window !== 'undefined') {
     }
   };
 
+  // Expose Widget directly for easier usage
+  window.Widget = Widget;
+
   console.log('Pages Template loaded.');
 }
 
