@@ -28,13 +28,6 @@ export class ProductPage {
   render() {
     const container = createElement('div', { className: 'product-detail-container' });
 
-    // Loading state
-    const loading = createElement('div', {
-      className: 'widget-loading',
-      innerHTML: '상품 정보를 불러오는 중...'
-    });
-    container.appendChild(loading);
-
     // Load and render product
     this.loadProduct()
       .then(() => {

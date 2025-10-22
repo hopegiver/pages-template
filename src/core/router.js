@@ -23,10 +23,17 @@ export class Router {
     this.currentRoute = null;
     this.currentPath = null;
     this.pathParams = {};
+    this.isNavigating = false;
+    this.loadingTimeout = null;
+    this.beforeNavigate = null; // 네비게이션 전 훅 (페이지 프리로드용)
 
     // popstate 이벤트 리스너 바인딩
     this.handlePopState = this.handlePopState.bind(this);
     window.addEventListener('popstate', this.handlePopState);
+
+    // hashchange 이벤트 리스너 바인딩
+    this.handleHashChange = this.handleHashChange.bind(this);
+    window.addEventListener('hashchange', this.handleHashChange);
   }
 
   /**
@@ -105,19 +112,47 @@ export class Router {
   /**
    * 라우트 처리
    */
-  handleRoute() {
+  async handleRoute() {
+    if (this.isNavigating) return;
+
     const path = this.getHash();
-
-    this.currentRoute = path;
-    this.currentPath = path;
-
     const match = this.matchRoute(path);
 
-    if (match) {
-      this.pathParams = match.params;
-      match.handler(match.params);
-    } else {
+    if (!match) {
       console.warn('No route handler found for:', path);
+      return;
+    }
+
+    this.isNavigating = true;
+
+    try {
+      // 1초 이상 걸릴 경우 로딩 표시
+      this.loadingTimeout = setTimeout(() => {
+        this.showLoadingIndicator();
+      }, 1000);
+
+      // beforeNavigate 훅 실행 (페이지 프리로드)
+      if (this.beforeNavigate) {
+        await this.beforeNavigate(path, match.params);
+      }
+
+      // 로딩 타임아웃 취소
+      clearTimeout(this.loadingTimeout);
+      this.hideLoadingIndicator();
+
+      // 라우트 정보 업데이트
+      this.currentRoute = path;
+      this.currentPath = path;
+      this.pathParams = match.params;
+
+      // 페이지 핸들러 실행
+      match.handler(match.params);
+    } catch (error) {
+      console.error('Route handling error:', error);
+      clearTimeout(this.loadingTimeout);
+      this.hideLoadingIndicator();
+    } finally {
+      this.isNavigating = false;
     }
   }
 
@@ -129,12 +164,52 @@ export class Router {
   }
 
   /**
+   * hashchange 이벤트 핸들러 (해시 변경 시)
+   */
+  handleHashChange() {
+    this.handleRoute();
+  }
+
+  /**
+   * 로딩 표시
+   */
+  showLoadingIndicator() {
+    const existingIndicator = document.querySelector('.router-loading-indicator');
+    if (existingIndicator) return;
+
+    const indicator = document.createElement('div');
+    indicator.className = 'router-loading-indicator';
+    indicator.innerHTML = '<div class="spinner"></div>';
+    document.body.appendChild(indicator);
+  }
+
+  /**
+   * 로딩 숨김
+   */
+  hideLoadingIndicator() {
+    const indicator = document.querySelector('.router-loading-indicator');
+    if (indicator) {
+      indicator.remove();
+    }
+  }
+
+  /**
+   * 네비게이션 전 훅 설정
+   * @param {Function} hook - async function(path, params) { ... }
+   */
+  setBeforeNavigate(hook) {
+    this.beforeNavigate = hook;
+  }
+
+  /**
    * 네비게이션 (히스토리에 추가)
    * @param {string} path - 경로 (예: "/product/1")
    * @param {object} state - 히스토리 상태
    */
   navigate(path, state = {}) {
+    // URL 먼저 변경
     window.history.pushState(state, '', `#${path}`);
+    // 라우트 처리 (프리로딩 포함)
     this.handleRoute();
   }
 
@@ -194,6 +269,7 @@ export class Router {
    */
   destroy() {
     window.removeEventListener('popstate', this.handlePopState);
+    window.removeEventListener('hashchange', this.handleHashChange);
   }
 
   /**

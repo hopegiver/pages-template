@@ -24,13 +24,6 @@ export class IndexPage {
   render() {
     const container = createElement('div', { className: 'product-list-container' });
 
-    // Loading state
-    const loading = createElement('div', {
-      className: 'widget-loading',
-      innerHTML: 'Loading products...'
-    });
-    container.appendChild(loading);
-
     // Load and render products
     this.loadProducts()
       .then(() => {

@@ -60,8 +60,31 @@ export class Widget {
       });
     }
 
+    // 페이지 프리로딩 훅 설정
+    this.router.setBeforeNavigate(async (path, params) => {
+      await this.preloadPage(path, params);
+    });
+
     // 라우터 초기화 (현재 URL에 맞는 뷰 렌더링)
     this.router.init();
+  }
+
+  /**
+   * 페이지 프리로딩
+   */
+  async preloadPage(path, params) {
+    // 페이지 타입에 따라 데이터 프리로드
+    if (path === '/') {
+      const indexPage = new IndexPage({ state: this.state });
+      await indexPage.loadProducts();
+    } else if (path.startsWith('/product/')) {
+      const productId = parseInt(params.id);
+      if (productId) {
+        const productPage = new ProductPage({ productId, state: this.state });
+        await productPage.loadProduct();
+      }
+    }
+    // 다른 페이지는 즉시 로드
   }
 
   /**
@@ -84,8 +107,6 @@ export class Widget {
     // 상태 업데이트
     this.state.setCurrentView('list');
 
-    containerElement.innerHTML = '';
-
     const productList = new IndexPage({
       state: this.state,
       onProductClick: (product) => {
@@ -95,7 +116,7 @@ export class Widget {
     });
 
     const listElement = productList.render();
-    containerElement.appendChild(listElement);
+    this.transitionToPage(containerElement, listElement);
   }
 
   /**
@@ -116,8 +137,6 @@ export class Widget {
     // 상태 업데이트
     this.state.setCurrentView('detail');
 
-    containerElement.innerHTML = '';
-
     const productDetail = new ProductPage({
       productId: productId,
       state: this.state,
@@ -134,7 +153,7 @@ export class Widget {
     });
 
     const detailElement = productDetail.render();
-    containerElement.appendChild(detailElement);
+    this.transitionToPage(containerElement, detailElement);
   }
 
   /**
@@ -145,7 +164,6 @@ export class Widget {
     if (!containerElement) return;
 
     this.state.setCurrentView('cart');
-    containerElement.innerHTML = '';
 
     const cartPage = new CartPage({
       state: this.state,
@@ -155,7 +173,41 @@ export class Widget {
     });
 
     const cartElement = cartPage.render();
-    containerElement.appendChild(cartElement);
+    this.transitionToPage(containerElement, cartElement);
+  }
+
+  /**
+   * 페이지 전환 애니메이션
+   */
+  transitionToPage(container, newPageElement) {
+    const oldPage = container.firstElementChild;
+
+    // 새 페이지 준비 (숨김 상태)
+    newPageElement.style.opacity = '0';
+    newPageElement.style.transition = 'opacity 0.05s ease-in-out';
+
+    if (oldPage) {
+      // 이전 페이지 fade out
+      oldPage.style.transition = 'opacity 0.05s ease-in-out';
+      oldPage.style.opacity = '0';
+
+      // fade out 완료 후 교체
+      setTimeout(() => {
+        container.innerHTML = '';
+        container.appendChild(newPageElement);
+
+        // 새 페이지 fade in
+        setTimeout(() => {
+          newPageElement.style.opacity = '1';
+        }, 10);
+      }, 50);
+    } else {
+      // 첫 페이지는 바로 표시
+      container.appendChild(newPageElement);
+      setTimeout(() => {
+        newPageElement.style.opacity = '1';
+      }, 10);
+    }
   }
 
   /**
