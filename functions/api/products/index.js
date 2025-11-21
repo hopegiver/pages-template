@@ -96,7 +96,7 @@ export async function onRequestGet({ request, env }) {
 
   } catch (error) {
     console.error('Error fetching products:', error);
-    return errorResponse('Failed to fetch products', 500);
+    return errorResponse(error.message || 'Failed to fetch products', 500);
   }
 }
 

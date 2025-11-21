@@ -1,12 +1,12 @@
-name = "pages-template"
+name = "malgn-template"
 compatibility_date = "2024-01-01"
-account_id = "d2b8c5524b7259214fa302f1fecb4ad6"
+pages_build_output_dir = "."
 
 # D1 Database Binding
 [[d1_databases]]
 binding = "DB"
 database_name = "ecommerce-db"
-database_id = "d689668f-4056-4309-af34-ca2331bb1f2c"
+database_id = "73744f90-b534-496b-be52-3d489c429719"
 
 # 환경 변수 (선택사항)
 [vars]
