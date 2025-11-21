@@ -50,6 +50,19 @@ export class ProductPage {
   renderProductDetail() {
     const detail = createElement('div', { className: 'product-detail' });
 
+    // API 필드명 변환 (snake_case to camelCase)
+    const product = {
+      ...this.product,
+      category: this.product.category_name || this.product.category,
+      reviewCount: this.product.review_count || this.product.reviewCount || 0,
+      originalPrice: this.product.original_price || this.product.originalPrice,
+      inStock: this.product.in_stock !== undefined ? this.product.in_stock : this.product.inStock,
+      deliveryInfo: this.product.delivery_info || this.product.deliveryInfo,
+    };
+
+    // product_images 배열을 images 배열로 변환
+    const images = product.product_images?.map(img => img.image_url) || product.images || [];
+
     detail.innerHTML = `
       <!-- 뒤로가기 -->
       <button class="back-button" id="back-btn">← 목록으로</button>
@@ -59,10 +72,10 @@ export class ProductPage {
         <!-- 왼쪽: 상품 이미지 -->
         <div class="product-images">
           <div class="main-image">
-            <img src="${this.product.image}" alt="${this.product.name}" id="main-image">
+            <img src="${product.image}" alt="${product.name}" id="main-image">
           </div>
           <div class="thumbnail-images">
-            ${this.product.images ? this.product.images.map((img, idx) => `
+            ${images.length > 0 ? images.map((img, idx) => `
               <img src="${img}" alt="상품 이미지 ${idx + 1}" class="thumbnail ${idx === 0 ? 'active' : ''}" data-index="${idx}">
             `).join('') : ''}
           </div>
@@ -70,35 +83,35 @@ export class ProductPage {
 
         <!-- 오른쪽: 상품 기본 정보 -->
         <div class="product-info">
-          <div class="product-category">${this.product.category}</div>
-          <h1 class="product-name">${this.product.name}</h1>
+          <div class="product-category">${product.category}</div>
+          <h1 class="product-name">${product.name}</h1>
 
           <div class="product-rating">
-            <span class="stars">${this.renderStars(this.product.rating)}</span>
-            <span class="rating-text">${this.product.rating} (${this.product.reviewCount}개 후기)</span>
+            <span class="stars">${this.renderStars(product.rating)}</span>
+            <span class="rating-text">${product.rating} (${product.reviewCount}개 후기)</span>
           </div>
 
           <div class="product-price-section">
-            ${this.product.discount ? `
-              <div class="original-price">${this.product.originalPrice.toLocaleString()}원</div>
-              <div class="discount-badge">${this.product.discount}%</div>
+            ${product.discount ? `
+              <div class="original-price">${product.originalPrice?.toLocaleString()}원</div>
+              <div class="discount-badge">${product.discount}%</div>
             ` : ''}
-            <div class="current-price">${this.product.price.toLocaleString()}원</div>
+            <div class="current-price">${product.price.toLocaleString()}원</div>
           </div>
 
           <div class="product-delivery">
             <div class="delivery-item">
               <span class="label">배송</span>
-              <span class="value">${this.product.shipping || '무료배송'}</span>
+              <span class="value">${product.shipping || '무료배송'}</span>
             </div>
             <div class="delivery-item">
               <span class="label">출고</span>
-              <span class="value">${this.product.deliveryInfo || '2-3일 소요'}</span>
+              <span class="value">${product.deliveryInfo || '2-3일 소요'}</span>
             </div>
             <div class="delivery-item">
               <span class="label">재고</span>
-              <span class="value ${this.product.inStock ? 'in-stock' : 'out-stock'}">
-                ${this.product.inStock ? `${this.product.stock || 0}개 남음` : '품절'}
+              <span class="value ${product.inStock ? 'in-stock' : 'out-stock'}">
+                ${product.inStock ? `${product.stock || 0}개 남음` : '품절'}
               </span>
             </div>
           </div>
@@ -236,11 +249,14 @@ export class ProductPage {
     // 썸네일 클릭
     const thumbnails = detail.querySelectorAll('.thumbnail');
     const mainImage = detail.querySelector('#main-image');
+    const images = this.product.product_images?.map(img => img.image_url) || this.product.images || [];
     thumbnails.forEach((thumb, idx) => {
       thumb.addEventListener('click', () => {
         thumbnails.forEach(t => t.classList.remove('active'));
         thumb.classList.add('active');
-        mainImage.src = this.product.images[idx];
+        if (images[idx]) {
+          mainImage.src = images[idx];
+        }
       });
     });
 

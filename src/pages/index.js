@@ -13,7 +13,9 @@ export class IndexPage {
 
   async loadProducts() {
     try {
-      this.products = await getProducts();
+      const response = await getProducts({ limit: 20 });
+      // API 응답이 { data: [], pagination: {} } 형식인 경우 처리
+      this.products = response.data || response;
       return this.products;
     } catch (error) {
       console.error('Failed to load products:', error);
